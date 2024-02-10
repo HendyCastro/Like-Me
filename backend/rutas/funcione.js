@@ -11,4 +11,16 @@ const agregarPost = async ( titulo, img, descripcion )=>{
 
 }
 
-module.exports = {datos_recibidos, agregarPost};
+const eliminarPost = async (postId) => {
+  try {
+    const query = 'DELETE FROM posts WHERE id = $1';
+    const result = await pool.query(query, [postId]);
+    if (result.rowCount === 0) {
+      throw new Error(`No se encontró ningún post con el ID ${postId}`);
+    }
+  } catch (error) {
+    throw new Error(`Error al eliminar el post con ID ${postId}: ${error.message}`);
+  }
+};
+
+module.exports = {datos_recibidos, agregarPost, eliminarPost};
