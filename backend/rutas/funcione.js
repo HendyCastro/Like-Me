@@ -12,19 +12,20 @@ const datos_recibidos = async () => {
 
 const agregarPost = async (titulo, img, descripcion) => {
   try {
-    const { rows } = await pool.query("INSERT INTO posts (titulo, img, descripcion) VALUES ($1, $2, $3)", [titulo, img, descripcion]);
+    const { rows } = await pool.query('INSERT INTO posts (titulo, img, descripcion, likes) VALUES ($1, $2, $3, 0) RETURNING *', [titulo, img, descripcion]);
     return rows;
   } catch (error) {
-    console.error('Error al agregar un post:', error);
-    throw new Error("Ocurrió un error al agregar el post a la base de datos");
+    console.error('Error al agregar el post:', error);
+    throw new Error('Ocurrió un error al agregar el post en la base de datos');
   }
 };
 
 const actualizarPost = async (postId, likes) => {
   try {
-    const {rows} = await pool.query("UPDATE posts SET likes = likes + $1 WHERE id = $2 RETURNING *", [likes, postId]);
+    const { rows } = await pool.query('UPDATE posts SET likes = likes + $1 WHERE id = $2 RETURNING *', [likes, postId]);
+    return rows;
   } catch (error) {
-    console.error(`Error al actualizar los likes del post con ID ${postId}:`, error);
+    console.error(`Error al actualizar los likes del post con ID ${postId}: ${error.message}`);
     throw new Error(`Error al actualizar los likes del post con ID ${postId}: ${error.message}`);
   }
 };
@@ -37,6 +38,7 @@ const eliminarPost = async (postId) => {
       throw new Error(`No se encontró ningún post con el ID ${postId}`);
     }
   } catch (error) {
+    console.error(`Error al eliminar el post con ID ${postId}: ${error.message}`);
     throw new Error(`Error al eliminar el post con ID ${postId}: ${error.message}`);
   }
 };
