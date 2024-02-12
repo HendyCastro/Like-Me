@@ -1,15 +1,33 @@
 const pool = require('../base_de_datos/inf');
 
-const datos_recibidos = async ( titulo, img, descripcion )=>{
-  const {rows} = await pool.query('select * from posts');
-  return rows
-}
+const datos_recibidos = async () => {
+  try {
+    const { rows } = await pool.query("SELECT * FROM posts");
+    return rows;
+  } catch (error) {
+    console.error('Error al obtener los datos:', error);
+    throw new Error("Ocurrió un error al obtener los datos de la base de datos");
+  }
+};
 
-const agregarPost = async ( titulo, img, descripcion )=>{
-    const {rows} = await pool.query('insert into posts (titulo, img, descripcion) values ($1, $2, $3)', [titulo, img, descripcion]);
-    return rows
+const agregarPost = async (titulo, img, descripcion) => {
+  try {
+    const { rows } = await pool.query("INSERT INTO posts (titulo, img, descripcion) VALUES ($1, $2, $3)", [titulo, img, descripcion]);
+    return rows;
+  } catch (error) {
+    console.error('Error al agregar un post:', error);
+    throw new Error("Ocurrió un error al agregar el post a la base de datos");
+  }
+};
 
-}
+const actualizarPost = async (postId, likes) => {
+  try {
+    const {rows} = await pool.query("UPDATE posts SET likes = likes + $1 WHERE id = $2 RETURNING *", [likes, postId]);
+  } catch (error) {
+    console.error(`Error al actualizar los likes del post con ID ${postId}:`, error);
+    throw new Error(`Error al actualizar los likes del post con ID ${postId}: ${error.message}`);
+  }
+};
 
 const eliminarPost = async (postId) => {
   try {
@@ -23,4 +41,4 @@ const eliminarPost = async (postId) => {
   }
 };
 
-module.exports = {datos_recibidos, agregarPost, eliminarPost};
+module.exports = {datos_recibidos, agregarPost, eliminarPost, actualizarPost};

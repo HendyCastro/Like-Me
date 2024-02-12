@@ -24,8 +24,12 @@ function App() {
 
   // este método se utilizará en el siguiente desafío
   const like = async (id) => {
-    await axios.put(urlBaseServer + `/posts/like/${id}`);
-    getPosts();
+    try {
+      await axios.put(`${urlBaseServer}/posts/like/${id}`, { likes: 1 });
+      getPosts();
+    } catch (error) {
+      console.error("Error al dar like al post:", error);
+    }
   };
 
   // este método se utilizará en el siguiente desafío
